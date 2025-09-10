@@ -1,0 +1,49 @@
+name: Berechne Tensor Arena Size
+
+on:
+  push:
+    paths:
+      - '**/*.tflite'   # Auslösen bei Änderungen an .tflite-Dateien
+  workflow_dispatch:     # Manuellen Trigger ermöglichen
+
+jobs:
+  find-arena-size:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checke Code aus
+        uses: actions/checkout@v4
+
+      - name: Installiere abhängigkeiten
+        run: npm install tflite-find-arena-size
+
+      - name: Finde .tflite-Modelle
+        id: models
+        run: |
+          echo "LIST<<EOF" > models.txt
+          find . -type f -name "*.tflite" >> models.txt
+          echo "EOF" >> models.txt
+          cat models.txt
+
+      - name: Berechne arena size für jedes Modell
+        run: |
+          models=$(find . -type f -name "*.tflite")
+          if [ -z "$models" ]; then
+            echo "Kein tflite-Modell gefunden."
+            exit 1
+          fi
+          node - << 'EOF'
+          const FindArena = require('tflite-find-arena-size');
+          const fs = require('fs').promises;
+          (async () => {
+            const fa = new FindArena();
+            await fa.init();
+            const models = process.argv.slice(2);
+            for (const m of models) {
+              const buf = await fs.readFile(m);
+              const size = await fa.findArenaSize(buf, 1 * 1024, 128 * 1024);
+              console.log(`Modell: ${m}`);
+              console.log(`  Empf. arena size = ${size} bytes`);
+            }
+          })();
+          EOF $(echo $models)

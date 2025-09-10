@@ -1,0 +1,12 @@
+{
+  "type": "micro",
+  "wake_word": "Gla_DOS",
+  "author": "Mqxx",
+  "website": "",
+  "model": "./Gla_DOS.tflite",
+  "version": 1,
+  "micro": {
+    "probability_cutoff": 0.5,
+    "sliding_window_average_size": 10
+  }
+}

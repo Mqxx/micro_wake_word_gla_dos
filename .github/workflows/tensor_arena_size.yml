@@ -14,6 +14,11 @@ jobs:
       - name: Checke Code aus
         uses: actions/checkout@v4
 
+      - name: Node.js 18 installieren
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
       - name: Installiere abhängigkeiten
         run: npm install tflite-find-arena-size
 

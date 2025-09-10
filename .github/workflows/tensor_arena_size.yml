@@ -1,40 +1,39 @@
-name: Berechne Tensor Arena Size
+name: Berechne Tensor Arena Size (C++)
 
 on:
   push:
     paths:
-      - '**/*.tflite'   # Auslösen bei Änderungen an .tflite-Dateien
-  workflow_dispatch:     # Manuellen Trigger ermöglichen
+      - "**/*.tflite"
+  workflow_dispatch:
 
 jobs:
-  find-arena-size:
+  arena-cpp:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checke Code aus
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Node.js 18 installieren
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Installiere abhängigkeiten
-        run: npm install tflite-find-arena-size
-
-      - name: Finde .tflite-Modelle
-        id: models
+      - name: Install Build Tools
         run: |
-          echo "LIST<<EOF" > models.txt
-          find . -type f -name "*.tflite" >> models.txt
-          echo "EOF" >> models.txt
-          cat models.txt
+          sudo apt-get update
+          sudo apt-get install -y cmake make build-essential
 
-      - name: Berechne arena size für jedes Modell
+      - name: Clone tflite-find-arena-size Submodule
         run: |
-          models=$(find . -type f -name "*.tflite")
-          if [ -z "$models" ]; then
-            echo "Kein tflite-Modell gefunden."
-            exit 1
-          fi
-          node compute_arena.js $models
+          git clone --depth=1 https://github.com/Kanaderu/tflite-find-arena-size.git tools/tflite-find-arena-size
+
+      - name: Build C++ Tool
+        run: |
+          cd tools/tflite-find-arena-size
+          make -f Makefile.tflite
+          ls -l build/find-arena-size
+
+      - name: Find and Run `.tflite` Models
+        run: |
+          echo "Gefundene .tflite Modelle:"
+          find . -type f -name "*.tflite"
+          for model in $(find . -type f -name "*.tflite"); do
+            echo "Modell: $model"
+            tools/tflite-find-arena-size/build/find-arena-size "$model"
+          done

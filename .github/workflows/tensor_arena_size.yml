@@ -32,18 +32,4 @@ jobs:
             echo "Kein tflite-Modell gefunden."
             exit 1
           fi
-          node - << 'EOF'
-          const FindArena = require('tflite-find-arena-size');
-          const fs = require('fs').promises;
-          (async () => {
-            const fa = new FindArena();
-            await fa.init();
-            const models = process.argv.slice(2);
-            for (const m of models) {
-              const buf = await fs.readFile(m);
-              const size = await fa.findArenaSize(buf, 1 * 1024, 128 * 1024);
-              console.log(`Modell: ${m}`);
-              console.log(`  Empf. arena size = ${size} bytes`);
-            }
-          })();
-          EOF $(echo $models)
+          node compute_arena.js $models

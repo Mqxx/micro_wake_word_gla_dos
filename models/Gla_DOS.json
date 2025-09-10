@@ -2,6 +2,7 @@
   "type": "micro",
   "wake_word": "Gla_DOS",
   "author": "Mqxx",
+  "website": "https://github.com/Mqxx/micro_wake_word_gla_dos",
   "model": "./Gla_DOS.tflite",
   "version": 2,
   "trained_languages": ["de"],

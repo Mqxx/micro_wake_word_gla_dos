@@ -33,8 +33,4 @@ jobs:
       - name: Find and Run `.tflite` Models
         run: |
           echo "Gefundene .tflite Modelle:"
-          find . -type f -name "*.tflite"
-          for model in $(find . -type f -name "*.tflite"); do
-            echo "Modell: $model"
-            tools/tflite-find-arena-size/build/find-arena-size "$model"
-          done
+          tools/tflite-find-arena-size/build/find-arena-size "models/Gla_DOS.tflite"

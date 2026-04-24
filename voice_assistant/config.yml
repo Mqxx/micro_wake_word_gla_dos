@@ -2,6 +2,9 @@ esphome:
   name: 'voice_assistant'
   friendly_name: 'Voice Assistant'
   comment: 'A local voice assistant'
+  project:
+    name: "mqxx.voice_assistant"
+    version: "0.1.0"
 
   environment_variables: {}
   
